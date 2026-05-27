@@ -1,0 +1,5 @@
+{
+  "version": "0.5.1",
+  "bin_url": "https://github.com/insight-aju/imsn/raw/refs/heads/main/firmware/imsn_firmware.bin",
+  "notes": "Teste OTA HTTP - atualização para versão 0.5.1"
+}
