@@ -1,5 +1,5 @@
 {
-  "version": "0.5.1",
-  "bin_url": "https://github.com/insight-aju/imsn/raw/refs/heads/main/firmware/imsn_firmware.bin",
-  "notes": "Teste OTA HTTP - atualização para versão 0.5.1"
+  "version": "0.5.2",
+  "bin_url": "https://raw.githubusercontent.com/insight-aju/imsn/main/firmware/imsn_firmware.bin",
+  "notes": "Status na tela principal, tema por cor e correção de consistência por user_id"
 }
