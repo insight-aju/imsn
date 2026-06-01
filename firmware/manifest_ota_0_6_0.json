@@ -1,0 +1,5 @@
+{
+  "version": "0.6.0",
+  "bin_url": "https://raw.githubusercontent.com/insight-aju/imsn/main/firmware/imsn_firmware.bin",
+  "notes": "Fecha a base ESP standalone 0.6.0, com interface separada em abas, OTA, MQTT, contatos, bloqueio, fontes, avatar no chat e ganchos adormecidos para imsn-server."
+}
