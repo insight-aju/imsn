@@ -1,5 +1,5 @@
 {
-  "version": "0.5.8",
+  "version": "0.5.9",
   "bin_url": "https://raw.githubusercontent.com/insight-aju/imsn/main/firmware/imsn_firmware.bin",
-  "notes": "Corrige alternância visual do botão de bloqueio e evita alertas de nova mensagem quando a conversa correspondente já está aberta e em foco."
+  "notes": "Adiciona miniatura/avatar do contato no cabeçalho da conversa, usando a inicial do nome como fallback."
 }
