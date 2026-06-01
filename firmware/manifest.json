@@ -1,5 +1,5 @@
 {
-  "version": "0.5.5",
+  "version": "0.5.8",
   "bin_url": "https://raw.githubusercontent.com/insight-aju/imsn/main/firmware/imsn_firmware.bin",
-  "notes": "Ajuste de sons: chamar atenção não dispara mais o som de nova mensagem; nudge usa apenas o som próprio."
+  "notes": "Corrige alternância visual do botão de bloqueio e evita alertas de nova mensagem quando a conversa correspondente já está aberta e em foco."
 }
