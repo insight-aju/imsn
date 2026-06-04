@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>imsn-web</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2c8df0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="imsn">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap">
+    <div class="window">
+      <div class="title">
+        <span>imsn-web <span id="shortId" class="smallid"></span></span>
+        <span class="buttons">_ □ X</span>
+      </div>
+
+      <div class="menu">
+        <span>Arquivo</span>
+        <span>Contatos</span>
+        <span>Ferramentas</span>
+        <span>Ajuda</span>
+      </div>
+
+      <div class="content">
+        <div class="profile">
+          <div class="avatarWrap">
+            <div class="avatar avatarClickable" id="avatar" title="Imagem de perfil" onclick="toggleAvatarMenu(event)">i</div>
+            <div id="avatarMenu" class="avatarMenu hidden">
+              <button type="button" onclick="chooseAvatar()">Escolher imagem</button>
+              <button type="button" onclick="clearAvatar()">Remover imagem</button>
+            </div>
+          </div>
+          <div class="profileInfo">
+            <div><b id="displayName">...</b> <span id="alias"></span></div>
+
+            <div class="statusWrap">
+              <span id="statusDot" class="statusDot"></span>
+              <button id="statusBtn" class="statusBtn" onclick="toggleStatusMenu(event)">
+                <span id="statusText">...</span> ▾
+              </button>
+
+              <div id="statusMenu" class="statusMenu hidden">
+                <button class="statusItem" onclick="setStatus('online')">Online</button>
+                <button class="statusItem" onclick="setStatus('ocupado')">Ocupado</button>
+                <button class="statusItem" onclick="setStatus('ausente')">Ausente</button>
+                <button class="statusItem" onclick="setStatus('invisivel')">Invisível</button>
+              </div>
+
+              <label class="themeBtn" title="Cor do tema">
+                <span class="themeSwatch"></span>
+                <input type="color" id="themePicker" class="themePicker">
+              </label>
+            </div>
+
+            <div class="muted" id="personalMsg"></div>
+            <div class="muted" id="netState"></div>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <div class="tab active" onclick="showTab('contacts',this)">Contatos</div>
+          <div class="tab" onclick="showTab('chat',this)">Conversa</div>
+          <div class="tab" onclick="showTab('config',this)">Config</div>
+        </div>
+
+        <div id="contacts" class="panel active">
+          <div class="row">
+            <input id="findAlias" placeholder="ID do contato. Ex: lucas" style="flex:1">
+            <button class="primary" onclick="findContact()">Procurar</button>
+            <button onclick="cancelSearch()">Cancelar busca</button>
+          </div>
+
+          <div id="foundBox" class="contactCard hidden"></div>
+          <div id="inviteBox"></div>
+
+          <h3>Contatos</h3>
+          <div id="contactList"></div>
+        </div>
+
+        <div id="chat" class="panel">
+          <div id="chatListView">
+            <div class="row">
+              <input id="chatFilter" placeholder="Filtrar conversas" style="flex:1" oninput="renderLists()">
+            </div>
+            <h3>Conversas abertas</h3>
+            <div id="conversationList"></div>
+          </div>
+
+          <div id="chatWindowView" class="hidden">
+            <div class="chatHeader">
+              <div class="chatPerson">
+                <div class="chatAvatar" id="chatAvatar">?</div>
+                <div>
+                  <b id="chatTitle">Conversa</b>
+                  <div class="muted" id="chatSub"></div>
+                </div>
+              </div>
+              <div>
+                <button id="blockBtn" class="miniBtn" title="Bloquear contato" onclick="toggleBlockActive()">🔓</button>
+                <button class="miniBtn" onclick="minimizeChat()">—</button>
+                <button class="xbtn" onclick="closeChat()">X</button>
+              </div>
+            </div>
+
+            <input id="chatTo" type="hidden">
+            <div class="muted" id="typing"></div>
+            <div class="msgbox" id="msgs"></div>
+
+            <div class="chatInput">
+              <div class="fontWrap">
+                <button id="fontBtn" class="fontBtn" title="Fonte da mensagem" onclick="toggleFontMenu(event)">A</button>
+                <div id="fontMenu" class="fontMenu hidden">
+                  <button class="font-normal" onclick="setMsgFont('normal')">Normal</button>
+                  <button class="font-grande" onclick="setMsgFont('grande')">Grande</button>
+                  <button class="font-pequena" onclick="setMsgFont('pequena')">Pequena</button>
+                  <button class="font-negrito" onclick="setMsgFont('negrito')">Negrito</button>
+                  <button class="font-italico" onclick="setMsgFont('italico')">Itálico</button>
+                  <button class="font-retro" onclick="setMsgFont('retro')">Retrô</button>
+                </div>
+              </div>
+
+              <div class="emojiWrap">
+                <button class="emojiBtn" title="Emotions" onclick="toggleEmojiMenu(event)">☺</button>
+                <div id="emojiMenu" class="emojiMenu hidden"></div>
+              </div>
+
+              <div class="messageInputArea">
+                <textarea id="body" placeholder="Digite uma mensagem"></textarea>
+                <div id="voiceDraft" class="voiceDraft hidden">
+                  <button id="voiceDraftDelete" class="voiceDiscard" type="button" title="Descartar áudio" onclick="discardVoiceDraft()">X</button>
+                  <div class="voiceDraftMain">
+                    <button id="voiceDraftPlay" class="voicePlayBtn" type="button" onclick="toggleVoiceDraftPlay()">▶️</button>
+                    <div class="voiceWave" id="voiceDraftWave"></div>
+                    <span id="voiceDraftDuration" class="voiceDuration">00:00</span>
+                  </div>
+                  <div id="voiceDraftLabel" class="voiceDraftLabel">Gravando...</div>
+                </div>
+                <div id="imageDraft" class="imageDraft hidden">
+                  <button class="imageDiscard" type="button" title="Descartar imagem" onclick="discardImageDraft()">X</button>
+                  <img id="imageDraftPreview" alt="Prévia da imagem">
+                  <div id="imageDraftLabel" class="imageDraftLabel">Imagem pronta para envio</div>
+                </div>
+                <div id="docDraft" class="docDraft hidden">
+                  <button class="docDiscard" type="button" title="Descartar arquivo" onclick="discardDocDraft()">X</button>
+                  <div class="docIcon">📎</div>
+                  <div class="docInfo">
+                    <b id="docDraftName">arquivo</b>
+                    <span id="docDraftSize" class="muted">0 KB</span>
+                    <div id="docDraftLabel" class="docDraftLabel">Arquivo pronto para envio</div>
+                  </div>
+                </div>
+              </div>
+              <button id="docBtn" class="miniBtn hidden" title="Enviar arquivo" onclick="chooseChatDoc()">📎</button>
+              <button id="imageBtn" class="miniBtn hidden" title="Enviar imagem" onclick="chooseChatImage()">🖼️</button>
+              <button id="voiceBtn" class="miniBtn hidden" title="Gravar áudio" onclick="toggleVoiceRecording()">🎙️</button>
+              <button class="primary" onclick="sendMsg()">Enviar</button>
+              <button class="miniBtn" title="Chamar atenção" onclick="nudgeContact()">⚡</button>
+            </div>
+
+            <div class="footerStatus" id="sendStatus"></div>
+          </div>
+        </div>
+
+        <div id="config" class="panel">
+          <form onsubmit="saveProfile(event)">
+            <p><b>User ID:</b> <span id="cfgUserId">...</span><br><b>Banco local:</b> <span id="dbStatus">iniciando</span><br><b>Recursos ativos:</b> <span id="activeFeaturesLine" class="featureLine">nenhum</span><br><b>Modo:</b> <span id="clientModeNote">Standalone / broker direto</span><span id="audioBrokerStatus" class="hidden legacyFeatureStatus"><b>Áudio Broker:</b> Ativo</span><span id="imageBrokerStatus" class="hidden legacyFeatureStatus"><b>Imagem Broker:</b> Ativo</span><span id="docBrokerStatus" class="hidden legacyFeatureStatus"><b>Arquivo Broker:</b> Ativo</span><span id="backupFeatureStatus" class="hidden legacyFeatureStatus"><b>Backup local:</b> Ativo</span></p>
+
+            <p>ID / alias<br><input id="cfgAlias" style="width:100%"></p>
+            <p>Nome exibido<br><input id="cfgDisplay" style="width:100%"></p>
+            <p>Mensagem pessoal<br><input id="cfgMsg" style="width:100%"></p>
+
+            <p>Broker WebSocket<br><input id="cfgBroker" style="width:100%"></p>
+            <p>Path WebSocket<br><input id="cfgPath" style="width:100%"></p>
+
+            <p>
+              <label><input type="checkbox" id="cfgTls"> Usar WSS/TLS</label><br>
+              <span class="muted">Local: ws://broker.hivemq.com:8000/mqtt | HTTPS: wss://broker.hivemq.com:8884/mqtt</span>
+            </p>
+
+            <p>
+              <label><input type="checkbox" id="cfgEnter"> Enviar mensagem com Enter</label><br>
+              <span class="muted">Shift+Enter quebra linha.</span>
+            </p>
+
+            <div class="row">
+              <button class="primary">Salvar perfil</button>
+              <button type="button" onclick="connectMqtt()">Conectar MQTT</button>
+              <button type="button" onclick="disconnectMqtt()">Desconectar</button>
+              <button type="button" onclick="toggleDiagnostics()">Diagnóstico</button>
+              <button id="manualInstallBtn" type="button" onclick="manualInstallApp()">Instalar app</button>
+            </div>
+
+
+
+
+            <div class="aboutBox hidden" id="aboutBox">
+              <b>Sobre / Diagnóstico</b><br>
+              <div id="aboutDiag" class="aboutDiag muted">Carregando diagnóstico...</div>
+              <div class="row">
+                <button type="button" onclick="refreshAboutDiag()">Atualizar diagnóstico</button>
+                <button type="button" onclick="reloadInterface()">Recarregar interface</button>
+                <button type="button" onclick="refreshAppCache()">Atualizar app/cache</button>
+                <button type="button" onclick="toggleStorageBox()">Armazenamento</button>
+              </div>
+              <div class="muted" id="appUpdateStatus"></div>
+            </div>
+
+            <div class="storageBox hidden" id="storageBox">
+              <b>Armazenamento local</b><br>
+              <span class="muted">Relatório do que está salvo, quanto ocupa e onde esse custo pesa hoje.</span>
+              <div id="storageStats" class="storageStats muted hidden">Calculando...</div>
+              <div class="row">
+                <button type="button" onclick="toggleStorageSummary()" id="storageSummaryBtn">Mostrar resumo</button>
+                <button type="button" class="danger" onclick="clearLocalMedia()">Limpar áudios/imagens/arquivos</button>
+                <button type="button" class="danger" onclick="clearLocalMessages()">Limpar mensagens</button>
+              </div>
+              <div class="muted" id="storageStatus"></div>
+            </div>
+
+            <div class="backupBox hidden" id="backupBox">
+              <b>Backup local</b><br>
+              <span class="muted">Exporta/importa perfil, contatos, conversas, preferências e mídia local.</span>
+              <div class="row">
+                <button type="button" onclick="exportImsnBackup()">Exportar backup</button>
+                <button type="button" onclick="chooseBackupFile()">Importar backup</button>
+              </div>
+              <div class="muted" id="backupStatus"></div>
+            </div>
+
+            <div class="muted" id="mqttStatus"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="installBox" class="installBox hidden">
+    <div>
+      <b>Instalar imsn</b><br>
+      <span>Adicionar à tela inicial para usar como app.</span>
+    </div>
+    <button id="installBtn" type="button">Instalar</button>
+    <button type="button" onclick="dismissInstallBox()">Agora não</button>
+  </div>
+
+  <input id="cfgAvatarFile" type="file" accept="image/*" style="display:none">
+  <input id="imageFileInput" type="file" accept="image/*" style="display:none">
+  <input id="docFileInput" type="file" accept=".txt,.pdf,.json,.csv,.log,.ino,.cpp,.h,.html,.css,.js,.md,text/plain,application/pdf,application/json,text/csv" style="display:none">
+  <input id="backupFileInput" type="file" accept=".json,application/json" style="display:none">
+  <div id="toast" class="toast"></div>
+
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+  <script src="db.js"></script>
+  <script src="storage.js"></script>
+  <script src="sounds.js"></script>
+  <script src="mqtt-client.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
