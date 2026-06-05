@@ -1,4 +1,4 @@
-const IMSN_WEB_VERSION = "1.0.0-client-standalone";
+const IMSN_WEB_VERSION = "1.0.1-client-onboarding";
 let state = loadLocal();
 if(state.avatar_data===undefined) state.avatar_data="";
 if(state.raw_alias===undefined) state.raw_alias=state.alias||"";
@@ -205,7 +205,7 @@ function render(){
   netState.innerText="MQTT: "+(mqttConnected?"online":"offline")+" | broker: "+state.broker_host;
   cfgUserId.innerText=state.user_id;const dbEl=document.getElementById("dbStatus");if(dbEl)dbEl.innerText=(typeof imsnDbStatus!=="undefined"?imsnDbStatus:"não iniciado");const afl=document.getElementById("activeFeaturesLine");if(afl)afl.innerHTML=activeFeaturePills();const cmn=document.getElementById("clientModeNote");if(cmn)cmn.innerText=policyModeLabel()+" / broker direto";const ab=document.getElementById("audioBrokerStatus");if(ab)ab.classList.toggle("hidden",!audioBrokerActive());const ib=document.getElementById("imageBrokerStatus");if(ib)ib.classList.toggle("hidden",!imageBrokerActive());const dbs=document.getElementById("docBrokerStatus");if(dbs)dbs.classList.toggle("hidden",!docBrokerActive());const bfs=document.getElementById("backupFeatureStatus");if(bfs)bfs.classList.toggle("hidden",!backupActive());const bb=document.getElementById("backupBox");if(bb)bb.classList.toggle("hidden",!backupActive());
   cfgAlias.value=state.raw_alias||state.alias;cfgDisplay.value=state.display;cfgMsg.value=state.message||"";
-  cfgBroker.value=state.broker_host;cfgPath.value=state.broker_path||"/mqtt";cfgTls.checked=!!state.broker_tls;cfgEnter.checked=!!state.enter_to_send;
+  cfgBroker.value=state.broker_host;cfgPath.value=state.broker_path||"/mqtt";if(location.protocol==="https:" && state.broker_host==="broker.hivemq.com")state.broker_tls=true;cfgTls.checked=!!state.broker_tls;cfgEnter.checked=!!state.enter_to_send;
   themePicker.value=state.theme_color||"#2c8df0";setAvatarBox(document.getElementById("cfgAvatarPreview"),state.avatar_data,state.display||"i");
   const vb=document.getElementById("voiceBtn");if(vb)vb.classList.toggle("hidden",!audioBrokerActive());const imgb=document.getElementById("imageBtn");if(imgb)imgb.classList.toggle("hidden",!imageBrokerActive());const docb=document.getElementById("docBtn");if(docb)docb.classList.toggle("hidden",!docBrokerActive());renderSearch();renderLists();renderChat();
 }
@@ -1148,6 +1148,122 @@ function activeFeatureList(){
 
 
 
+
+
+function applyHttpsDefaults(){
+  if(location.protocol==="https:" && state.broker_host==="broker.hivemq.com"){
+    state.broker_tls=true;
+    if(cfgTls)cfgTls.checked=true;
+    saveLocal();
+  }
+}
+
+async function sha256Hex(text){
+  const enc=new TextEncoder();
+  const buf=await crypto.subtle.digest("SHA-256",enc.encode(text));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+function randomSalt(){
+  const a=new Uint32Array(4);
+  crypto.getRandomValues(a);
+  return Array.from(a).map(x=>x.toString(16)).join("");
+}
+
+function showOnboarding(){
+  const box=document.getElementById("onboardingBox");
+  if(box){
+    const fa=document.getElementById("firstAlias");
+    const fd=document.getElementById("firstDisplay");
+    if(fa)fa.value=state.raw_alias||state.alias||"";
+    if(fd)fd.value=state.display||"";
+    box.classList.remove("hidden");
+  }
+}
+
+function hideOnboarding(){
+  const box=document.getElementById("onboardingBox");
+  if(box)box.classList.add("hidden");
+}
+
+function showLock(){
+  const box=document.getElementById("lockBox");
+  if(box)box.classList.remove("hidden");
+  setTimeout(()=>{const p=document.getElementById("unlockPass");if(p)p.focus();},150);
+}
+
+function hideLock(){
+  const box=document.getElementById("lockBox");
+  if(box)box.classList.add("hidden");
+}
+
+async function finishFirstRun(){
+  const st=document.getElementById("firstRunStatus");
+  const a=(document.getElementById("firstAlias")?.value||"").trim();
+  const d=(document.getElementById("firstDisplay")?.value||"").trim();
+  const p=(document.getElementById("firstPass")?.value||"");
+  const p2=(document.getElementById("firstPass2")?.value||"");
+
+  if(!a){if(st)st.innerText="Escolha um ID / alias.";return;}
+  if(!d){if(st)st.innerText="Informe um nome exibido.";return;}
+  if(p.length<4){if(st)st.innerText="Use uma senha com pelo menos 4 caracteres.";return;}
+  if(p!==p2){if(st)st.innerText="As senhas não conferem.";return;}
+
+  const parsed=parseAliasForFeatures(a);
+  state.raw_alias=a;
+  state.alias=parsed.alias;
+  state.audio_broker_enabled=parsed.audio;
+  state.image_broker_enabled=parsed.image;
+  state.doc_broker_enabled=parsed.doc;
+  state.backup_enabled=parsed.backup;
+  state.display=d;
+  state.auth_salt=randomSalt();
+  state.auth_hash=await sha256Hex(state.auth_salt+"|"+p);
+  state.auth_enabled=true;
+  state.auth_last_ok=new Date().toISOString();
+  state.onboarding_done=true;
+  applyHttpsDefaults();
+  sessionStorage.setItem("imsn_unlocked_"+state.user_id,"1");
+  saveLocal();
+  hideOnboarding();
+  render();
+  try{connectMqtt();publishPresence();}catch(e){}
+  const installDismissed=localStorage.getItem("imsn_install_dismissed")==="1";
+  const installBox=document.getElementById("installBox");
+  if(installBox && !installDismissed) installBox.classList.remove("hidden");
+}
+
+async function unlockLocalAccess(){
+  const st=document.getElementById("unlockStatus");
+  const p=(document.getElementById("unlockPass")?.value||"");
+  if(!p){if(st)st.innerText="Digite a senha.";return;}
+  const h=await sha256Hex((state.auth_salt||"")+"|"+p);
+  if(h!==state.auth_hash){
+    if(st)st.innerText="Senha incorreta.";
+    return;
+  }
+  state.auth_last_ok=new Date().toISOString();
+  sessionStorage.setItem("imsn_unlocked_"+state.user_id,"1");
+  saveLocal();
+  hideLock();
+  applyHttpsDefaults();
+  render();
+  try{connectMqtt();publishPresence();}catch(e){}
+}
+
+function startAccessFlow(){
+  applyHttpsDefaults();
+  if(!state.onboarding_done || !state.auth_hash){
+    showOnboarding();
+    return;
+  }
+  if(state.auth_enabled && sessionStorage.getItem("imsn_unlocked_"+state.user_id)!=="1"){
+    showLock();
+    return;
+  }
+  try{connectMqtt();publishPresence();}catch(e){}
+}
+
 function getServerPolicy(){
   if(!state.server_policy){
     state.server_policy={mode:0,label:"Standalone",server_url:"",server_seen:false,broker_id:"hivemq-public",broker_authorized:true,policy_id:"",min_web_version:"",update_url:"",require_server:false,last_check:null};
@@ -1245,7 +1361,7 @@ function refreshAboutDiag(){
       '<span>Modo</span><span>'+pwaMode+'</span>'+
       '<span>User ID</span><span style="word-break:break-all">'+(state.user_id||"")+'</span>'+
       '<span>Alias público</span><span>@'+(state.alias||"")+'</span>'+
-      '<span>Recursos ativos</span><span>'+activeFeatureList()+'</span>'+'<span>Modo de operação</span><span>'+policyModeLabel()+'</span>'+'<span>Servidor</span><span>'+(getServerPolicy().server_seen?'online':'não configurado/offline')+'</span>'+'<span>Broker autorizado</span><span>'+boolStatus(getServerPolicy().broker_authorized,'sim','não')+'</span>'+
+      '<span>Recursos ativos</span><span>'+activeFeatureList()+'</span>'+'<span>Modo de operação</span><span>'+policyModeLabel()+'</span>'+'<span>Autenticação local</span><span>'+boolStatus(!!state.auth_hash,'configurada','não configurada')+'</span>'+'<span>Servidor</span><span>'+(getServerPolicy().server_seen?'online':'não configurado/offline')+'</span>'+'<span>Broker autorizado</span><span>'+boolStatus(getServerPolicy().broker_authorized,'sim','não')+'</span>'+
       '<span>MQTT</span><span>'+boolStatus(!!mqttConnected,"online","offline")+'</span>'+
       '<span>IndexedDB</span><span>'+boolStatus(hasIDB && !!imsnDbReady,"ativo","indisponível")+'</span>'+
       '<span>Microfone</span><span>'+boolStatus(hasMic,"suportado","sem suporte")+'</span>'+
@@ -1289,8 +1405,8 @@ function setFieldEvents(){const backupInput=document.getElementById("backupFileI
 setFieldEvents();
 applyMsgFont();
 render();
-connectMqtt();
-setInterval(()=>publishPresence(),30000);
+startAccessFlow();
+setInterval(()=>{if(sessionStorage.getItem("imsn_unlocked_"+state.user_id)==="1")publishPresence()},30000);
 
 
 // PWA install / service worker

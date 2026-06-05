@@ -451,3 +451,17 @@ Entrega:
 - Inclui diagnóstico de modo de operação.
 - Não depende do imsn-server.
 - Inclui README_USUARIO.md, README_TECNICO.md e PUBLICAR_GITHUB_PAGES.md.
+
+
+imsn-web v1.0.1-client-onboarding
+
+Correções/adições:
+- Em HTTPS/GitHub Pages, ativa WSS/TLS automaticamente para evitar bloqueio de ws://.
+- Primeira experiência de uso:
+  - pede ID / alias
+  - pede nome exibido
+  - pede senha local
+- Senha local é salva como hash SHA-256 com salt.
+- Ao abrir depois, pede senha para desbloquear o PWA neste dispositivo.
+- O app só conecta MQTT automaticamente após configuração/desbloqueio.
+- Diagnóstico mostra autenticação local configurada.

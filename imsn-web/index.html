@@ -241,6 +241,48 @@
   </div>
 
 
+
+  <div id="onboardingBox" class="firstRunOverlay hidden">
+    <div class="firstRunCard">
+      <h2>Bem-vindo ao imsn</h2>
+      <p class="muted">Configure seu acesso inicial para usar o imsn-web como aplicativo standalone.</p>
+
+      <label>ID / alias</label>
+      <input id="firstAlias" placeholder="Ex: igor">
+
+      <label>Nome exibido</label>
+      <input id="firstDisplay" placeholder="Ex: Igor">
+
+      <label>Senha local do imsn</label>
+      <input id="firstPass" type="password" placeholder="Senha para entrar neste app">
+
+      <label>Confirmar senha</label>
+      <input id="firstPass2" type="password" placeholder="Repita a senha">
+
+      <div class="firstRunHint">
+        Esta senha protege este PWA neste dispositivo. No futuro, ela também ajudará na autenticação com o servidor oficial.
+      </div>
+
+      <div class="row">
+        <button class="primary" type="button" onclick="finishFirstRun()">Entrar no imsn</button>
+      </div>
+      <div id="firstRunStatus" class="footerStatus"></div>
+    </div>
+  </div>
+
+  <div id="lockBox" class="firstRunOverlay hidden">
+    <div class="firstRunCard smallLock">
+      <h2>Entrar no imsn</h2>
+      <p class="muted">Digite sua senha local para desbloquear este app.</p>
+      <label>Senha</label>
+      <input id="unlockPass" type="password" placeholder="Senha do imsn" onkeydown="if(event.key==='Enter')unlockLocalAccess()">
+      <div class="row">
+        <button class="primary" type="button" onclick="unlockLocalAccess()">Desbloquear</button>
+      </div>
+      <div id="unlockStatus" class="footerStatus"></div>
+    </div>
+  </div>
+
   <div id="installBox" class="installBox hidden">
     <div>
       <b>Instalar imsn</b><br>

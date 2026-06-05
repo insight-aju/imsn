@@ -1,7 +1,7 @@
 {
   "name": "imsn-web",
   "short_name": "imsn",
-  "description": "Cliente imsn Web/PWA standalone, instalável e pronto para uso sem servidor.",
+  "description": "Cliente imsn Web/PWA standalone com primeira configuração e WSS automático.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -22,5 +22,5 @@
       "purpose": "any maskable"
     }
   ],
-  "version": "1.0.0-client-standalone"
+  "version": "1.0.1-client-onboarding"
 }

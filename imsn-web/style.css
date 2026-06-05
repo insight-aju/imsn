@@ -689,3 +689,51 @@ button.danger{background:linear-gradient(#fff5f5,#ffdede);border-color:#d88}
 .advancedConnBox.hidden,.aboutBox.hidden,.storageBox.hidden,.storageStats.hidden{display:none!important}
 .advancedConnBox{border:1px dashed #9ab;border-radius:6px;padding:8px;margin:8px 0;background:rgba(255,255,255,.55)}
 #advancedConnBtn{margin:7px 0 4px 0}
+
+
+/* v1.0.1 primeira experiência / bloqueio local */
+.firstRunOverlay{
+  position:fixed;
+  inset:0;
+  z-index:300;
+  background:rgba(180,255,250,.92);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+.firstRunOverlay.hidden{display:none!important}
+.firstRunCard{
+  width:min(460px,96vw);
+  background:linear-gradient(#ffffff,var(--accentPale));
+  border:1px solid var(--lineStrong);
+  border-radius:10px;
+  box-shadow:7px 7px 0 rgba(0,0,0,.20);
+  padding:18px;
+}
+.firstRunCard h2{
+  margin:0 0 8px 0;
+  color:#123;
+}
+.firstRunCard label{
+  display:block;
+  margin-top:10px;
+  font-weight:bold;
+}
+.firstRunCard input{
+  width:100%;
+  box-sizing:border-box;
+  margin-top:3px;
+}
+.firstRunHint{
+  margin-top:10px;
+  padding:8px;
+  border:1px dashed #9ab;
+  border-radius:6px;
+  font-size:12px;
+  color:#456;
+  background:rgba(255,255,255,.55);
+}
+.smallLock{
+  width:min(360px,94vw);
+}

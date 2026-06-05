@@ -1,4 +1,4 @@
-const IMSN_CACHE = "imsn-web-v1.0.0-client-standalone";
+const IMSN_CACHE = "imsn-web-v1.0.1-client-onboarding";
 const APP_SHELL = [
   "./",
   "./index.html",

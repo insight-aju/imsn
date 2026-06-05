@@ -21,12 +21,10 @@ Ele funciona sem servidor próprio nesta fase, usando o broker MQTT, assim como 
 
 ## Primeiro uso
 
-1. Abra a aba **Config**.
-2. Escolha seu **ID / alias**.
-3. Escolha seu **Nome exibido**.
-4. Clique em **Salvar perfil**.
-5. Clique em **Conectar MQTT**.
-6. Vá em **Contatos** e procure outro usuário pelo ID.
+1. Ao abrir pela primeira vez, informe seu **ID / alias**, **nome exibido** e **senha local**.
+2. Clique em **Entrar no imsn**.
+3. O app usará conexão segura automaticamente quando estiver no GitHub Pages.
+4. Vá em **Contatos** e procure outro usuário pelo ID.
 
 ## Recursos ocultos
 
@@ -41,3 +39,8 @@ Exemplo: `igorHzPx` aparece para os outros como `igor`.
 
 Esta versão funciona em modo **Standalone / broker direto**.
 Quando o servidor oficial existir, o app poderá passar para modo gerenciado.
+
+
+## Segurança local
+
+A senha local protege este PWA neste dispositivo. Nesta versão ela ainda não autentica no servidor, mas já prepara o caminho para a autenticação oficial futura.
